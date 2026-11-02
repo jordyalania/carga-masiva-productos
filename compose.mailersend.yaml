@@ -1,0 +1,12 @@
+# Explicit live SMTP override. Mailpit stays available but no longer receives
+# messages sent by Notifier while this override is active.
+services:
+  notifier:
+    environment:
+      Smtp__Host: smtp.mailersend.net
+      Smtp__Port: "587"
+      Smtp__Security: StartTls
+      Smtp__User: ${MAILERSEND_SMTP_USER:?Configure MAILERSEND_SMTP_USER in private .env}
+      Smtp__Password: ${MAILERSEND_SMTP_PASSWORD:?Configure MAILERSEND_SMTP_PASSWORD in private .env}
+      Smtp__From: ${MAILERSEND_FROM:?Configure a verified MAILERSEND_FROM in private .env}
+      Notification__RecipientOverride: ${NOTIFICATION_TEST_RECIPIENT:?Set the authorized test recipient}

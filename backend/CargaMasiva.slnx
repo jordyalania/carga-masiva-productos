@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="src/Shared/Shared.csproj" />
+  <Project Path="src/Auth/Auth.csproj" />
+  <Project Path="src/Gateway/Gateway.csproj" />
+  <Project Path="src/Control/Control.csproj" />
+  <Project Path="src/Importer/Importer.csproj" />
+  <Project Path="src/Notifier/Notifier.csproj" />
+</Solution>

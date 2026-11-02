@@ -1,0 +1,20 @@
+# Use only on the intended server after setting DNS/domain and private secrets.
+services:
+  https:
+    image: caddy:2.10-alpine
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?Configure the public domain in private .env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - tls-data:/data
+      - tls-config:/config
+    depends_on: [web]
+    restart: unless-stopped
+    networks: [web]
+volumes:
+  tls-data:
+  tls-config:

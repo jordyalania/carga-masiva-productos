@@ -1,0 +1,1 @@
+<Project Sdk="Microsoft.NET.Sdk"><ItemGroup><FrameworkReference Include="Microsoft.AspNetCore.App"/><PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0"/><PackageReference Include="Dapper" Version="2.1.66"/><PackageReference Include="Npgsql" Version="9.0.4"/><PackageReference Include="RabbitMQ.Client" Version="7.1.2"/></ItemGroup></Project>

@@ -1,0 +1,34 @@
+# Server behind an existing Traefik v2/v3 that already owns ports 80/443.
+# Use instead of compose.server.yaml (Caddy). Only `web` joins Traefik's network;
+# databases, broker, files and microservices stay on the private backend network.
+services:
+  web:
+    ports: !reset []
+    networks: [web, backend, traefik]
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: ${TRAEFIK_NETWORK:-traefik}
+      traefik.http.routers.carga-masiva.rule: Host(`${APP_DOMAIN:?Configure the public domain in private .env}`)
+      traefik.http.routers.carga-masiva.entrypoints: ${TRAEFIK_ENTRYPOINT:-websecure}
+      traefik.http.routers.carga-masiva.tls.certresolver: ${TRAEFIK_CERTRESOLVER:?Set the Traefik ACME resolver name}
+      traefik.http.services.carga-masiva.loadbalancer.server.port: "80"
+    mem_limit: 64m
+
+  gateway:
+    ports: !reset []
+    mem_limit: 256m
+  auth: {mem_limit: 256m}
+  control: {mem_limit: 256m}
+  notifier: {mem_limit: 256m}
+  # ClosedXML keeps the workbook in memory; allow margin for the 10 MiB upload limit.
+  importer: {mem_limit: 1g}
+  frontend: {mem_limit: 256m}
+  postgres: {mem_limit: 512m}
+  rabbitmq: {mem_limit: 512m}
+  seaweedfs: {mem_limit: 512m}
+  mailpit: {mem_limit: 128m}
+
+networks:
+  traefik:
+    name: ${TRAEFIK_NETWORK:-traefik}
+    external: true

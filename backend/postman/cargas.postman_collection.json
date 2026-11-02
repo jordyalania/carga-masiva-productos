@@ -1,0 +1,205 @@
+{
+  "info": {
+    "name": "Carga masiva — backend local",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Configurar email/password con los valores del .env local. Login guarda token; subida guarda loadId. No subir .env a Git."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "email",
+      "value": "demo@example.test"
+    },
+    {
+      "key": "password",
+      "value": ""
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "loadId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Login",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/auth/login",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{email}}\", \"password\": \"{{password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Login OK\", () => pm.response.to.have.status(200));",
+              "if(pm.response.code === 200) pm.collectionVariables.set(\"token\", pm.response.json().accessToken);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Subir Excel (seleccionar archivo)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/cargas",
+        "header": [],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": []
+            },
+            {
+              "key": "recipients",
+              "type": "text",
+              "value": "persona@example.test,otra@example.test",
+              "disabled": true,
+              "description": "Opcional: hasta cinco destinatarios. Si está desactivado se usa el destino predeterminado."
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Carga aceptada\", () => pm.response.to.have.status(202));",
+              "if(pm.response.code === 202) pm.collectionVariables.set(\"loadId\", pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Historial",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/cargas?page=1&pageSize=20",
+        "header": [],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. Detalle y estados",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/cargas/{{loadId}}",
+        "header": [],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. Resultados por fila",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/cargas/{{loadId}}/filas?page=1&pageSize=100",
+        "header": [],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "6. Descargar Excel original",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/cargas/{{loadId}}/archivo",
+        "header": [],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Salud",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health",
+        "header": []
+      }
+    },
+    {
+      "name": "7. Remitente y destino predeterminado",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/cargas/notificacion",
+        "header": [],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

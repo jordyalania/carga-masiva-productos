@@ -1,0 +1,12 @@
+.git
+node_modules
+.output
+.tanstack
+.nitro
+.wrangler
+.env
+.env.*
+*.local
+
+backend
+artifacts
